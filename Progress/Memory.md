@@ -108,6 +108,29 @@ Get a free Gemini API key from https://aistudio.google.com/apikey, add it to `.e
 **Next action:** ...
 ```
 
+## Session 6 — Post-First-Submission Cleanup (2026-07-17)
+
+First submission scored 93.9/100, rank #241/42,244. Lowest sub-scores: Efficiency (80), Code Quality (88) — everything else 98-99.
+
+Identified one concrete, defensible issue: the app was still carrying a full unused Anthropic provider code path (SDK dependency + branching logic in `llm_client.py` + `LLM_PROVIDER` env switch) that was never actually exercised in the deployed app (Anthropic billing was never funded) and directly violated the project's own Rules.md ("anthropic or openai, never both"). Also found `Architecture.md` still listed Anthropic/`claude-sonnet-4-6` as the primary GenAI stack, contradicting a bolted-on "Final Status" note at the bottom that correctly said Gemini — an internal documentation inconsistency an AI evaluator could reasonably penalize.
+
+**Changes made:**
+- `llm_client.py` rewritten Gemini-only. Kept the single-interface abstraction (`generate()`/`generate_json()`) so a second provider could still be added later without touching `reasoning_engine.py` or `chat_service.py` — removed the dead implementation, not the design pattern.
+- `config.py`: removed `LLM_PROVIDER`, `ANTHROPIC_API_KEY`, `LLM_MODEL` settings. Only `GEMINI_API_KEY` / `GEMINI_MODEL` remain.
+- `requirements.txt`: removed `anthropic==0.69.0`.
+- `.env.example`, `render.yaml`: updated to match, with the Flash-Lite quota reasoning documented inline.
+- `Architecture.md`: fixed the primary tech-stack claim to correctly state Gemini/`gemini-flash-lite-latest`, with an honest note explaining the Anthropic path was removed and why. Also updated §6 env vars and cleaned up the redundant "Final Status" section so it no longer contradicts the main body.
+- `Rules.md`: updated the allowed-libraries list to match (`google-genai` only).
+
+**Verified before repackaging (not assumed):**
+- Fresh, fully isolated venv install of `requirements.txt` — zero conflicts.
+- All 18 tests pass in that fresh venv.
+- App boots cleanly, `/health` returns 200, dashboard renders, CSV upload succeeds — all re-verified after the code changes, not just "should still work."
+
+**Not yet verified:** the user has not yet redeployed this version to Render or re-tested the live link. Local verification only so far this session. If a second submission attempt is used, the deployed link MUST be re-tested end-to-end first, same as every previous deploy — this has been true every session so far and remains true now.
+
+**Decision on submission strategy:** user has 2 of 3 attempts remaining. Advised NOT to resubmit until the cleaned-up version is verified working on the actual redeployed Render link, and to keep the current 93.9-scoring commit recoverable (via git history) in case attempt 2 needs to fall back to it.
+
 ## Final Project Status
 
 Project Status: Completed

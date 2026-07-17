@@ -4,10 +4,10 @@
 
 - **Backend:** Python 3.11+, FastAPI, Uvicorn
 - **Data handling:** pandas (CSV parsing), Pydantic (validation/schemas)
-- **GenAI:** Anthropic Claude API (`anthropic` SDK) — model `claude-sonnet-4-6`, called server-side only. (Swap to OpenAI only if the API key situation forces it — architecture below is provider-agnostic via a single `llm_client.py` wrapper.)
+- **GenAI:** Google Gemini API (`google-genai` SDK) — model `gemini-flash-lite-latest` (Google's self-updating Flash-Lite alias), called server-side only, via a single `llm_client.py` wrapper. Chosen over Anthropic because it has a genuine no-credit-card free tier suitable for a zero-budget submission, and its higher daily quota (vs. the newer flagship Flash tier) suits this app's short, structured tasks well. An earlier draft of this app briefly supported Anthropic Claude as a second provider behind a runtime switch; that path was removed once Gemini proved sufficient, since carrying an unused second SDK and branching logic added complexity without benefit (see Rules.md — one provider at a time, not both).
 - **Frontend:** Server-rendered HTML (Jinja2 templates) + vanilla JS + Tailwind via CDN. No React/build step — keeps repo tiny and deploy trivial.
 - **Storage:** In-memory (Python dict/session) for the current dataset + SQLite (single file, via `sqlite3` stdlib) for the incident log only. No external DB dependency.
-- **Deployment:** Render (Web Service, free tier), same pattern as prior MediVerse AI deployment.
+- **Deployment:** Render (Web Service, free tier).
 - **Testing:** `pytest`
 
 ## 2. High-Level Flow
@@ -98,32 +98,14 @@ crowdpulse/
 ## 6. Environment Variables (`.env`, never committed)
 
 ```
-ANTHROPIC_API_KEY=
-LLM_MODEL=claude-sonnet-4-6
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-flash-lite-latest
 MAX_UPLOAD_MB=2
 RATE_LIMIT_CHAT_PER_MIN=10
 ```
 
 ## Final Architecture Status
 
-The final implementation follows a lightweight FastAPI architecture designed for rapid deployment and maintainability.
+Implementation matches the plan above with one deliberate simplification made mid-build: the dual-provider (Anthropic + Gemini) design was reduced to Gemini-only once it proved sufficient and reliable, removing an unused SDK dependency and a code branch that never ran in the deployed app. `llm_client.py` still exposes a single provider-agnostic interface (`generate()` / `generate_json()`), so a second provider could be reintroduced later without touching `reasoning_engine.py` or `chat_service.py` — the abstraction was kept, the redundant implementation was not.
 
-Core Components:
-
-- FastAPI backend
-- Jinja2 server-side templates
-- Vanilla JavaScript frontend
-- SQLite incident log
-- Provider-agnostic LLM wrapper
-- Gemini Flash (default)
-- CSV validation and parsing pipeline
-- AI reasoning engine
-- Operations chat service
-
-Deployment:
-
-- Render (Free Tier)
-- Environment-variable based configuration
-- Secure API key management
-
-Status: Final implementation completed and successfully deployed.
+Status: Deployed and verified against the live Render URL, including CSV upload, AI Ops Brief, Ops Chat, incident logging, and CSV export.

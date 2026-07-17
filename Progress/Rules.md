@@ -4,7 +4,7 @@ These are hard boundaries for any AI tool (Claude, ChatGPT, Cursor, etc.) workin
 
 ## 1. Allowed Libraries
 
-- Backend: `fastapi`, `uvicorn`, `pydantic`, `pandas`, `python-dotenv`, `anthropic` (or `openai` only as a swap-in, never both), `python-multipart` (file upload), `jinja2`, stdlib `sqlite3`, `slowapi` (rate limiting) — only if simple manual rate limiting proves insufficient
+- Backend: `fastapi`, `uvicorn`, `pydantic`, `pandas`, `python-dotenv`, `google-genai` (single GenAI provider — do not add a second provider SDK unless the first is fully removed first, never carry two simultaneously), `python-multipart` (file upload), `jinja2`, stdlib `sqlite3`
 - Frontend: vanilla JS, Tailwind CDN. No jQuery, no frontend framework, no bundler/build step.
 - Testing: `pytest`, `pytest-mock`
 
