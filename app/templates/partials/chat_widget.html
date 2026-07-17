@@ -1,0 +1,23 @@
+<div class="bg-surface border border-edge rounded-lg p-4 flex flex-col h-[520px]">
+  <h2 class="text-lg font-semibold mb-3">Ops Chat</h2>
+  <p class="text-xs text-textmuted mb-3">Ask about current gate/zone status in plain language.</p>
+
+  <div id="chat-messages" class="flex-1 overflow-y-auto space-y-2 mb-3 pr-1" aria-live="polite" aria-label="Chat conversation">
+    <div class="text-sm text-textmuted italic">Ask a question once data is loaded — e.g. "Which gates are critical right now?"</div>
+  </div>
+
+  <form id="chat-form" class="flex gap-2">
+    <label for="chat-input" class="sr-only">Ask a question about current stadium status</label>
+    <input
+      id="chat-input"
+      type="text"
+      maxlength="500"
+      placeholder="Ask a question..."
+      class="flex-1 bg-bgbase border border-edge rounded px-3 py-2 text-sm text-textprimary placeholder:text-textmuted focus:border-aiaccent"
+      autocomplete="off"
+    />
+    <button type="submit" class="px-4 py-2 rounded bg-brand text-bgbase text-sm font-semibold hover:opacity-90">
+      Send
+    </button>
+  </form>
+</div>

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}CrowdPulse — Ops Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+
+  <header class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-edge">
+    <div>
+      <h1 class="text-2xl font-bold">CrowdPulse</h1>
+      <p class="text-sm text-textmuted">GenAI Crowd Command Center — Tournament Operations</p>
+    </div>
+
+    <form id="upload-form" class="flex items-center gap-2">
+      <label for="csv-upload" class="text-sm text-textmuted">Upload gate/zone data:</label>
+      <input
+        id="csv-upload"
+        name="file"
+        type="file"
+        accept=".csv"
+        class="text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-brand file:text-bgbase file:font-semibold file:cursor-pointer bg-surface border border-edge rounded"
+        aria-describedby="upload-hint"
+      />
+      <button type="submit" class="px-3 py-1.5 rounded border border-edge text-sm hover:border-textmuted">
+        Load
+      </button>
+    </form>
+  </header>
+  <p id="upload-hint" class="text-xs text-textmuted -mt-4 mb-6">
+    No live feed handy? Use the sample file at <code class="bg-surface px-1 rounded">data/sample_gate_data.csv</code> in this repo to test the app end-to-end.
+  </p>
+  <div id="upload-error" class="hidden mb-4 text-sm text-critical border border-critical/40 bg-critical/10 rounded p-3" role="alert"></div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      {% include "partials/zone_grid.html" %}
+
+      <div class="flex items-center justify-between">
+        <h2 class="sr-only">AI Ops Brief Controls</h2>
+        <button
+          id="generate-brief-btn"
+          class="px-4 py-2 rounded bg-aiaccent text-bgbase text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+          {% if is_empty %}disabled{% endif %}
+        >
+          Generate AI Brief
+        </button>
+        <span id="brief-loading" class="hidden text-sm text-textmuted">Analyzing...</span>
+      </div>
+
+      <div id="ai-brief-container">
+        {% include "partials/ai_brief.html" %}
+      </div>
+
+      <div id="incident-log-container" class="bg-surface border border-edge rounded-lg p-4">
+        {% include "partials/incident_log.html" %}
+      </div>
+    </div>
+
+    <div class="lg:col-span-1">
+      {% include "partials/chat_widget.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}

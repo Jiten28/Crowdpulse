@@ -1,0 +1,39 @@
+<div id="ai-brief-wrapper" class="bg-surface border-l-4 border-aiaccent rounded-lg p-4">
+  <div class="flex items-center gap-2 mb-3">
+    <h2 class="text-lg font-semibold">AI Ops Brief</h2>
+    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-aiaccent/20 text-aiaccent">AI-Generated</span>
+  </div>
+
+  {% if error %}
+  <div class="text-sm text-critical" role="alert">
+    AI assessment temporarily unavailable: {{ error }}
+  </div>
+  {% elif no_flags %}
+  <p class="text-sm text-textmuted">All zones are within normal range — no AI assessment needed right now.</p>
+  {% elif not assessments %}
+  <p class="text-sm text-textmuted">Click "Generate AI Brief" to get risk assessments and recommendations for flagged zones.</p>
+  {% else %}
+  <div class="space-y-3">
+    {% for a in assessments %}
+    <div class="border border-edge rounded p-3">
+      <div class="flex items-center justify-between mb-1">
+        <p class="font-semibold">{{ a.zone_name }}</p>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded
+          {% if a.risk_level.value == 'Critical' %}bg-critical/20 text-critical{% else %}bg-watch/20 text-watch{% endif %}">
+          {{ a.risk_level.value }} &middot; {{ a.urgency }} urgency
+        </span>
+      </div>
+      <p class="text-sm text-textmuted mb-2">{{ a.reasoning }}</p>
+      <p class="text-sm"><span class="font-medium text-aiaccent">Recommended:</span> {{ a.recommended_action }}</p>
+      <button
+        class="mt-2 text-xs px-3 py-1 rounded border border-brand text-brand hover:bg-brand/10 log-action-btn"
+        data-zone="{{ a.zone_name }}"
+        data-action="{{ a.recommended_action }}"
+        data-status="{{ a.risk_level.value }}">
+        Mark as Actioned
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>

@@ -1,0 +1,43 @@
+<div id="zone-grid-wrapper">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-lg font-semibold">Gate &amp; Zone Status</h2>
+    {% if uploaded_at %}
+    <span class="text-sm text-textmuted">Data as of {{ uploaded_at }}</span>
+    {% endif %}
+  </div>
+
+  {% if not zones %}
+  <div class="border border-edge rounded-lg p-8 text-center text-textmuted bg-surface">
+    No data loaded yet. Upload a gate/zone CSV above to see live status here.
+  </div>
+  {% else %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Gate and zone status cards">
+    {% for z in zones %}
+    <div role="listitem" class="bg-surface border border-edge rounded-lg p-4
+      {% if z.status.value == 'Critical' %}ring-1 ring-critical{% elif z.status.value == 'Watch' %}ring-1 ring-watch{% endif %}">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <p class="font-semibold">{{ z.zone_name }}</p>
+          <p class="text-xs text-textmuted">Gate {{ z.gate_id }}</p>
+        </div>
+        {% if z.status.value == 'Critical' %}
+        <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded bg-critical/20 text-critical" aria-label="Status: Critical">
+          <span aria-hidden="true">&#9650;</span> Critical
+        </span>
+        {% elif z.status.value == 'Watch' %}
+        <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded bg-watch/20 text-watch" aria-label="Status: Watch">
+          <span aria-hidden="true">&#9679;</span> Watch
+        </span>
+        {% else %}
+        <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded bg-brand/20 text-brand" aria-label="Status: Normal">
+          <span aria-hidden="true">&#10003;</span> Normal
+        </span>
+        {% endif %}
+      </div>
+      <p class="text-3xl font-bold tabular-nums">{{ z.occupancy_pct }}%</p>
+      <p class="text-sm text-textmuted">{{ z.current_count }} / {{ z.capacity }} &middot; {{ z.entry_rate }}/min entry rate</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
