@@ -77,28 +77,56 @@ def _get_gemini_client():
     return _gemini_client
 
 
-def _generate_gemini(system_prompt: str, user_prompt: str, max_tokens: int, json_mode: bool) -> str:
+def _build_config(system_prompt: str, max_tokens: int, json_mode: bool, use_thinking_level: bool):
     from google.genai import types
+    return types.GenerateContentConfig(
+        system_instruction=system_prompt,
+        max_output_tokens=max_tokens,
+        response_mime_type="application/json" if json_mode else "text/plain",
+        # Gemini 3.x models (which gemini-flash-latest currently resolves to)
+        # CANNOT fully disable thinking — thinking_budget=0 is silently
+        # ignored on these models, unlike the older 2.5 series where it
+        # actually turns thinking off. MINIMAL is the closest equivalent for
+        # Gemini 3.x. Older/other models may reject thinking_level entirely,
+        # so this is attempted first and the caller falls back to no
+        # thinking_config at all if the API rejects the parameter.
+        thinking_config=types.ThinkingConfig(thinking_level="MINIMAL") if use_thinking_level else None,
+    )
+
+
+def _generate_gemini(system_prompt: str, user_prompt: str, max_tokens: int, json_mode: bool) -> str:
     from google.genai import errors as genai_errors
 
-    try:
-        client = _get_gemini_client()
-        config = types.GenerateContentConfig(
-            system_instruction=system_prompt,
-            max_output_tokens=max_tokens,
-            response_mime_type="application/json" if json_mode else "text/plain",
-        )
-        response = client.models.generate_content(
-            model=settings.GEMINI_MODEL,
-            contents=user_prompt,
-            config=config,
-        )
-        if not response.text:
-            raise LLMError("Gemini returned no text content.")
-        return response.text
-    except genai_errors.APIError as exc:
-        logger.error("Gemini API error: %s", exc)
-        raise LLMError(f"Gemini API error: {exc}") from exc
+    client = _get_gemini_client()
+
+    # Generous headroom is the real safety net here, not the thinking
+    # control — even MINIMAL thinking still consumes some tokens on Gemini
+    # 3.x ("still requires thought signatures" per Google's docs), so we
+    # can't assume thinking uses zero budget even when minimized.
+    effective_max_tokens = max(max_tokens, 1500)
+
+    for use_thinking_level in (True, False):
+        try:
+            config = _build_config(system_prompt, effective_max_tokens, json_mode, use_thinking_level)
+            response = client.models.generate_content(
+                model=settings.GEMINI_MODEL,
+                contents=user_prompt,
+                config=config,
+            )
+            if not response.text:
+                raise LLMError("Gemini returned no text content.")
+            return response.text
+        except genai_errors.APIError as exc:
+            # If thinking_level itself was rejected (e.g. an older model that
+            # doesn't support it), retry once without any thinking_config
+            # rather than failing the whole request over a param mismatch.
+            if use_thinking_level and "thinking_level" in str(exc).lower():
+                logger.warning("thinking_level not supported by this model, retrying without it.")
+                continue
+            logger.error("Gemini API error: %s", exc)
+            raise LLMError(f"Gemini API error: {exc}") from exc
+
+    raise LLMError("Gemini call failed after retrying without thinking_level.")
 
 
 # ---------------------------------------------------------------------------

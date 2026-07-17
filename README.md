@@ -30,6 +30,7 @@ cp .env.example .env
 ```
 
 Then edit `.env`:
+
 - **Recommended (free):** leave `LLM_PROVIDER=gemini` and get a free key at https://aistudio.google.com/apikey — no credit card, no expiration, ~1,500 requests/day on Gemini 2.5 Flash.
 - **Alternative (paid):** set `LLM_PROVIDER=anthropic` and add a funded `ANTHROPIC_API_KEY` from console.anthropic.com if you'd rather use Claude and have credits available.
 
@@ -43,7 +44,7 @@ Visit `http://127.0.0.1:8000`.
 
 Deployed on Render using `render.yaml` (or `Procfile` as a fallback). Set `LLM_PROVIDER` and the matching API key (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`) as environment variables in the Render dashboard — never commit them.
 
-**Live deployed link:** _add after deploying_
+**Live deployed link: https://crowdpulse-70bq.onrender.com **
 
 ## How to test end-to-end (evaluator path)
 
@@ -51,10 +52,12 @@ Deployed on Render using `render.yaml` (or `Procfile` as a fallback). Set `LLM_P
 2. Upload `data/sample_gate_data.csv` (already in the repo) using the "Load" button.
 3. Confirm the zone grid populates with a mix of Normal / Watch / Critical statuses.
 4. Click **Generate AI Brief** — confirm real, data-specific reasoning and recommendations appear for the Watch/Critical zones (not generic text).
-5. In the Ops Chat, ask: *"Which gates are critical right now?"* and *"What should I do about the busiest zone?"* — confirm answers reference the actual uploaded numbers.
+5. In the Ops Chat, ask: _"Which gates are critical right now?"_ and _"What should I do about the busiest zone?"_ — confirm answers reference the actual uploaded numbers.
 6. Click **Mark as Actioned** on a recommendation — confirm it appears in the Incident Log below.
 7. Click **Export CSV** — confirm a valid CSV downloads with the logged action.
 8. Try uploading a non-CSV file or an empty file — confirm a clear error message, not a crash.
+
+All 8 steps above have been manually verified working end-to-end against a live Gemini API key (not just localhost during development — see Memory.md for the full verification history, including issues found and fixed along the way).
 
 ## Running tests
 
@@ -67,6 +70,8 @@ pytest tests/ -v
 ## Troubleshooting
 
 **"This model models/... is no longer available" (404/403 from Gemini):** Google has been retiring specific Gemini model versions early for new API keys throughout 2026, sometimes ahead of their official deprecation date. The app uses `gemini-flash-latest`, Google's self-updating alias, specifically to avoid this — but if Google renames the alias itself, check the current model list at https://ai.google.dev/gemini-api/docs/models and update `GEMINI_MODEL` in `.env`.
+
+**AI responses cut off mid-sentence:** Gemini 3.x models (which `gemini-flash-latest` currently resolves to) spend part of their output budget on internal "thinking" before writing the visible answer, and — unlike the older 2.5 series — this thinking cannot be fully disabled on 3.x models. The app already handles this: it requests `thinking_level="MINIMAL"` (the correct 3.x control) with a fallback if that's ever rejected, plus a hard minimum token floor on every call. If you still see truncation after changing models, increase `max_tokens` in `reasoning_engine.py` (AI Brief) or `chat_service.py` (Ops Chat).
 
 **"Your credit balance is too low" (Anthropic):** you're on `LLM_PROVIDER=anthropic` without funded credits. Either add credits at console.anthropic.com, or switch to `LLM_PROVIDER=gemini` in `.env` (no cost).
 
