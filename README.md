@@ -21,7 +21,7 @@ There's no real stadium IoT/turnstile feed available for this challenge. Per the
 ## Setup
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/Jiten28/Crowdpulse
 cd crowdpulse
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
@@ -44,7 +44,7 @@ Visit `http://127.0.0.1:8000`.
 
 Deployed on Render using `render.yaml` (or `Procfile` as a fallback). Set `LLM_PROVIDER` and the matching API key (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`) as environment variables in the Render dashboard — never commit them.
 
-**Live deployed link: https://crowdpulse-70bq.onrender.com **
+**Live deployed link: https://crowdpulse-70bq.onrender.com**
 
 ## How to test end-to-end (evaluator path)
 
