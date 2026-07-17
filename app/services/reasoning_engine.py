@@ -67,7 +67,7 @@ def generate_ops_brief(flagged_zones: List[ZoneStatus]) -> List[RiskAssessment]:
                     "required schema. Return ONLY a raw JSON array, nothing else — no markdown "
                     "fences, no explanation text before or after."
                 )
-            raw = generate_json(SYSTEM_PROMPT, prompt, max_tokens=2500)
+            raw = generate_json(SYSTEM_PROMPT, prompt, max_tokens=3000)
             if not isinstance(raw, list):
                 raise ValueError("Expected a JSON array from the LLM.")
 
