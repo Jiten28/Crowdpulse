@@ -47,7 +47,7 @@ def answer_question(user_message: str) -> str:
     user_prompt = f"Current data:\n{data_context}\n\nOrganizer's question: {clean_message}"
 
     try:
-        return generate(SYSTEM_PROMPT, user_prompt, max_tokens=400).strip()
+        return generate(SYSTEM_PROMPT, user_prompt, max_tokens=1000).strip()
     except LLMError as exc:
         logger.warning("Chat answer failed: %s", exc)
         raise

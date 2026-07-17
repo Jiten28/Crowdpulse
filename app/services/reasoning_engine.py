@@ -67,17 +67,19 @@ def generate_ops_brief(flagged_zones: List[ZoneStatus]) -> List[RiskAssessment]:
                     "required schema. Return ONLY a raw JSON array, nothing else — no markdown "
                     "fences, no explanation text before or after."
                 )
-            raw = generate_json(SYSTEM_PROMPT, prompt, max_tokens=1200)
+            raw = generate_json(SYSTEM_PROMPT, prompt, max_tokens=2500)
             if not isinstance(raw, list):
                 raise ValueError("Expected a JSON array from the LLM.")
 
             assessments = [RiskAssessment(**item) for item in raw]
-            logger.info("Ops brief generated successfully for %d zones.", len(assessments))
+            logger.info(
+                "Ops brief generated successfully for %d zones.", len(assessments))
             return assessments
 
         except (LLMError, ValidationError, ValueError, TypeError) as exc:
             logger.warning("Ops brief attempt %d failed: %s", attempt, exc)
             if attempt == 2:
-                raise LLMError(f"Could not generate a valid AI ops brief after retry: {exc}") from exc
+                raise LLMError(
+                    f"Could not generate a valid AI ops brief after retry: {exc}") from exc
 
     return []  # unreachable, satisfies type checkers
