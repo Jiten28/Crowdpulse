@@ -21,7 +21,7 @@ There's no real stadium IoT/turnstile feed available for this challenge. Per the
 ## Setup
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/Jiten28/Crowdpulse
 cd crowdpulse
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
