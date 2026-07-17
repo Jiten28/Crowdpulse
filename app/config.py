@@ -18,10 +18,11 @@ class Settings:
     LLM_MODEL: str = os.getenv("LLM_MODEL", "claude-sonnet-5")
 
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
 
     MAX_UPLOAD_MB: int = int(os.getenv("MAX_UPLOAD_MB", "2"))
-    RATE_LIMIT_CHAT_PER_MIN: int = int(os.getenv("RATE_LIMIT_CHAT_PER_MIN", "10"))
+    RATE_LIMIT_CHAT_PER_MIN: int = int(
+        os.getenv("RATE_LIMIT_CHAT_PER_MIN", "10"))
     ALLOWED_ORIGIN: str = os.getenv("ALLOWED_ORIGIN", "*")
     INCIDENT_DB_PATH: str = os.getenv("INCIDENT_DB_PATH", "incidents.db")
 
