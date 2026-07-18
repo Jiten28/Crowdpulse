@@ -10,6 +10,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/")
 async def dashboard(request: Request):
+    """Renders the main dashboard page with the current dataset, if any is loaded."""
     return templates.TemplateResponse(
         "dashboard.html",
         {
@@ -29,4 +30,5 @@ async def dashboard(request: Request):
 
 @router.get("/health")
 async def health():
+    """Liveness check used by the deployment platform."""
     return {"status": "ok"}

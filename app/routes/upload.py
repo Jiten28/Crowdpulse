@@ -11,6 +11,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.post("/upload")
 async def upload_csv(request: Request, file: UploadFile = File(...)):
+    """Validates and loads an uploaded gate/zone CSV, returning the refreshed zone grid fragment."""
     if not file.filename or not file.filename.lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only .csv files are accepted.")
 

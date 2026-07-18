@@ -21,7 +21,7 @@ There's no real stadium IoT/turnstile feed available for this challenge. Per the
 ## Setup
 
 ```bash
-git clone https://github.com/Jiten28/Crowdpulse.git
+git clone <this-repo>
 cd crowdpulse
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
@@ -30,7 +30,6 @@ cp .env.example .env
 ```
 
 Then edit `.env`:
-
 - **Recommended (free):** leave `LLM_PROVIDER=gemini` and get a free key at https://aistudio.google.com/apikey — no credit card, no expiration, ~1,500 requests/day on Gemini 2.5 Flash.
 - **Alternative (paid):** set `LLM_PROVIDER=anthropic` and add a funded `ANTHROPIC_API_KEY` from console.anthropic.com if you'd rather use Claude and have credits available.
 
@@ -44,7 +43,7 @@ Visit `http://127.0.0.1:8000`.
 
 Deployed on Render using `render.yaml` (or `Procfile` as a fallback). Set `LLM_PROVIDER` and the matching API key (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`) as environment variables in the Render dashboard — never commit them.
 
-**Live deployed link:https://crowdpulse-70bq.onrender.com**
+**Live deployed link:** _add after deploying_
 
 ## How to test end-to-end (evaluator path)
 
@@ -52,7 +51,7 @@ Deployed on Render using `render.yaml` (or `Procfile` as a fallback). Set `LLM_P
 2. Upload `data/sample_gate_data.csv` (already in the repo) using the "Load" button.
 3. Confirm the zone grid populates with a mix of Normal / Watch / Critical statuses.
 4. Click **Generate AI Brief** — confirm real, data-specific reasoning and recommendations appear for the Watch/Critical zones (not generic text).
-5. In the Ops Chat, ask: _"Which gates are critical right now?"_ and _"What should I do about the busiest zone?"_ — confirm answers reference the actual uploaded numbers.
+5. In the Ops Chat, ask: *"Which gates are critical right now?"* and *"What should I do about the busiest zone?"* — confirm answers reference the actual uploaded numbers.
 6. Click **Mark as Actioned** on a recommendation — confirm it appears in the Incident Log below.
 7. Click **Export CSV** — confirm a valid CSV downloads with the logged action.
 8. Try uploading a non-CSV file or an empty file — confirm a clear error message, not a crash.

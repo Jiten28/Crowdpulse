@@ -11,6 +11,8 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 class LogIncidentRequest(BaseModel):
+    """Body of a POST /incidents request."""
+
     zone_name: str = Field(min_length=1, max_length=100)
     action_taken: str = Field(min_length=1, max_length=300)
     status_at_time: StatusLevel
@@ -18,6 +20,7 @@ class LogIncidentRequest(BaseModel):
 
 @router.post("/incidents")
 async def create_incident(request: Request, body: LogIncidentRequest):
+    """Logs an actioned recommendation and returns the refreshed incident log fragment."""
     try:
         log_incident(body.zone_name, body.action_taken, body.status_at_time)
     except Exception as exc:
@@ -31,6 +34,7 @@ async def create_incident(request: Request, body: LogIncidentRequest):
 
 @router.get("/incidents/export")
 async def export_incidents():
+    """Streams the full incident log back as a downloadable CSV."""
     csv_data = export_csv()
     return StreamingResponse(
         iter([csv_data]),

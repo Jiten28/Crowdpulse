@@ -25,7 +25,6 @@ logger = logging.getLogger(__name__)
 
 class LLMError(Exception):
     """Raised when the LLM call fails or returns unusable output."""
-    pass
 
 
 _client = None
@@ -57,7 +56,7 @@ def _build_config(system_prompt: str, max_tokens: int, json_mode: bool, use_thin
 
 
 def _call(system_prompt: str, user_prompt: str, max_tokens: int, json_mode: bool) -> str:
-    """Shared call path for generate() and generate_json() — handles the thinking_level fallback and token floor."""
+    """Shared by generate() and generate_json(); handles the thinking-level fallback and token floor."""
     client = _get_client()
 
     # Generous headroom is the real safety net, not just the thinking

@@ -6,10 +6,13 @@ LLM's JSON against), and incident_log persists IncidentRecord.
 """
 from enum import Enum
 from typing import Optional
+
 from pydantic import BaseModel, Field, field_validator
 
 
 class StatusLevel(str, Enum):
+    """The three occupancy states a zone can be in, driven by the configured thresholds."""
+
     NORMAL = "Normal"
     WATCH = "Watch"
     CRITICAL = "Critical"
@@ -27,6 +30,7 @@ class ZoneReading(BaseModel):
     @field_validator("current_count")
     @classmethod
     def count_not_absurd(cls, v: int) -> int:
+        """Rejects obviously-corrupt CSV values rather than silently accepting them."""
         if v > 1_000_000:
             raise ValueError("current_count is unrealistically large")
         return v
@@ -59,6 +63,7 @@ class RiskAssessment(BaseModel):
     @field_validator("urgency")
     @classmethod
     def urgency_valid(cls, v: str) -> str:
+        """Normalizes and constrains the LLM's urgency field to a fixed set of values."""
         v_lower = v.lower().strip()
         if v_lower not in {"low", "medium", "high"}:
             raise ValueError("urgency must be low, medium, or high")
@@ -66,14 +71,20 @@ class RiskAssessment(BaseModel):
 
 
 class ChatRequest(BaseModel):
+    """Body of a POST /ai/chat request."""
+
     message: str = Field(min_length=1, max_length=500)
 
 
 class ChatResponse(BaseModel):
+    """Body of a POST /ai/chat response."""
+
     reply: str
 
 
 class IncidentRecord(BaseModel):
+    """A single logged, actioned recommendation, as stored in and read from SQLite."""
+
     id: Optional[int] = None
     timestamp: str
     zone_name: str

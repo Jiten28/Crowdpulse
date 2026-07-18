@@ -1,11 +1,12 @@
 import pytest
 
 from app.models.schemas import StatusLevel, ZoneStatus
-from app.services.llm_client import LLMError
 from app.services import reasoning_engine
+from app.services.llm_client import LLMError
 
 
 def make_zone_status(name="Test Zone", status=StatusLevel.CRITICAL):
+    """Builds a minimal ZoneStatus fixture for reasoning-engine tests."""
     return ZoneStatus(
         gate_id="A1",
         zone_name=name,
@@ -18,6 +19,7 @@ def make_zone_status(name="Test Zone", status=StatusLevel.CRITICAL):
 
 
 def test_no_flagged_zones_returns_empty_without_calling_llm(mocker):
+    """When nothing is flagged, the LLM is never called — no wasted API calls on an all-clear dataset."""
     spy = mocker.patch("app.services.reasoning_engine.generate_json")
     result = reasoning_engine.generate_ops_brief([])
     assert result == []
@@ -25,6 +27,7 @@ def test_no_flagged_zones_returns_empty_without_calling_llm(mocker):
 
 
 def test_valid_llm_response_parses_into_risk_assessments(mocker):
+    """A well-formed LLM JSON response parses correctly into validated RiskAssessment objects."""
     mock_response = [
         {
             "zone_name": "Test Zone",
@@ -45,6 +48,7 @@ def test_valid_llm_response_parses_into_risk_assessments(mocker):
 
 
 def test_malformed_json_retries_then_raises(mocker):
+    """Invalid JSON triggers exactly one retry, then raises — never retries forever or fails silently."""
     mock_gen = mocker.patch(
         "app.services.reasoning_engine.generate_json",
         side_effect=LLMError("not valid json"),
@@ -56,6 +60,7 @@ def test_malformed_json_retries_then_raises(mocker):
 
 
 def test_response_missing_required_field_is_rejected(mocker):
+    """An LLM response missing a required schema field is rejected by Pydantic, not passed through."""
     bad_response = [{"zone_name": "Test Zone", "risk_level": "Critical"}]  # missing fields
     mocker.patch("app.services.reasoning_engine.generate_json", return_value=bad_response)
     with pytest.raises(LLMError):
@@ -63,6 +68,7 @@ def test_response_missing_required_field_is_rejected(mocker):
 
 
 def test_invalid_urgency_value_is_rejected(mocker):
+    """An LLM response with an urgency value outside low/medium/high is rejected, not accepted as-is."""
     bad_response = [
         {
             "zone_name": "Test Zone",

@@ -5,12 +5,15 @@ call os.getenv() directly. This keeps secrets out of business logic and
 makes it obvious where to look if a config value is wrong.
 """
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
 class Settings:
+    """All environment-dependent configuration, loaded once at import time."""
+
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
 
