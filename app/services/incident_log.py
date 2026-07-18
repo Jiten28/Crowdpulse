@@ -14,6 +14,7 @@ from app.models.schemas import IncidentRecord, StatusLevel
 
 
 def _get_conn() -> sqlite3.Connection:
+    """Opens a connection and ensures the incidents table exists (idempotent)."""
     conn = sqlite3.connect(settings.INCIDENT_DB_PATH)
     conn.execute(
         """
@@ -30,6 +31,7 @@ def _get_conn() -> sqlite3.Connection:
 
 
 def log_incident(zone_name: str, action_taken: str, status_at_time: StatusLevel) -> IncidentRecord:
+    """Persists a single actioned recommendation with a server-generated timestamp."""
     timestamp = datetime.now(timezone.utc).isoformat()
     conn = _get_conn()
     try:
@@ -50,6 +52,7 @@ def log_incident(zone_name: str, action_taken: str, status_at_time: StatusLevel)
 
 
 def get_all_incidents() -> List[IncidentRecord]:
+    """Returns every logged incident, most recent first."""
     conn = _get_conn()
     try:
         rows = conn.execute(

@@ -32,6 +32,7 @@ _client = None
 
 
 def _get_client():
+    """Lazily creates and caches the Gemini client so import time stays fast."""
     global _client
     if _client is None:
         from google import genai
@@ -56,6 +57,7 @@ def _build_config(system_prompt: str, max_tokens: int, json_mode: bool, use_thin
 
 
 def _call(system_prompt: str, user_prompt: str, max_tokens: int, json_mode: bool) -> str:
+    """Shared call path for generate() and generate_json() — handles the thinking_level fallback and token floor."""
     client = _get_client()
 
     # Generous headroom is the real safety net, not just the thinking

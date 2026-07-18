@@ -14,6 +14,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 def _client_key(request: Request) -> str:
+    """Per-client key for rate limiting, falling back to a constant if the client host is unavailable."""
     return request.client.host if request.client else "unknown"
 
 

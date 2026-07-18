@@ -13,6 +13,7 @@ from app.models.schemas import StatusLevel, ZoneReading, ZoneStatus
 
 
 def _status_for(occupancy_pct: float) -> StatusLevel:
+    """Maps an occupancy percentage to a status level using the configured thresholds."""
     if occupancy_pct >= settings.CRITICAL_THRESHOLD:
         return StatusLevel.CRITICAL
     if occupancy_pct >= settings.WATCH_THRESHOLD:
@@ -24,20 +25,25 @@ class DataStore:
     """Simple in-memory singleton-style store. One dataset at a time by design."""
 
     def __init__(self) -> None:
+        """Starts empty — no dataset is loaded until load() is called."""
         self._readings: List[ZoneReading] = []
         self._uploaded_at: Optional[str] = None
 
     def load(self, readings: List[ZoneReading]) -> None:
+        """Replaces the current dataset with a freshly uploaded one and stamps the upload time."""
         self._readings = readings
         self._uploaded_at = datetime.now(timezone.utc).isoformat()
 
     def is_empty(self) -> bool:
+        """True if no dataset has been loaded yet."""
         return len(self._readings) == 0
 
     def uploaded_at(self) -> Optional[str]:
+        """ISO timestamp of the most recent upload, or None if nothing has been loaded."""
         return self._uploaded_at
 
     def get_statuses(self) -> List[ZoneStatus]:
+        """Returns all zones with computed occupancy % and status, sorted highest-risk first."""
         statuses = []
         for r in self._readings:
             occupancy_pct = round((r.current_count / r.capacity) * 100, 1) if r.capacity else 0.0

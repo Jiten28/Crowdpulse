@@ -12,6 +12,7 @@ _requests: Dict[str, List[float]] = defaultdict(list)
 
 
 def is_allowed(key: str, max_per_minute: int) -> bool:
+    """Returns True and records the request if the key is under its per-minute limit, else False."""
     now = time.time()
     window_start = now - 60
     _requests[key] = [t for t in _requests[key] if t > window_start]

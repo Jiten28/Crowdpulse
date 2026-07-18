@@ -36,6 +36,7 @@ Do not invent zones that weren't given to you. Do not omit any zone that was giv
 
 
 def _build_user_prompt(zones: List[ZoneStatus]) -> str:
+    """Formats flagged zone data into the plain-text block the LLM reasons over."""
     lines = []
     for z in zones:
         lines.append(
