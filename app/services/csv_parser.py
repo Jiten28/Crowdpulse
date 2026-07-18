@@ -15,6 +15,7 @@ REQUIRED_COLUMNS = {"timestamp", "gate_id", "zone_name", "current_count", "capac
 
 class CSVValidationError(Exception):
     """Raised for any problem with an uploaded CSV. Message is safe to show the user."""
+    pass
 
 
 def parse_csv_bytes(raw: bytes, max_mb: int) -> List[ZoneReading]:

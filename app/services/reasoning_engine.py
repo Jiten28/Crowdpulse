@@ -27,11 +27,9 @@ and what a control-room organizer could realistically do in the next few minutes
 Respond with ONLY a JSON array, no prose, no markdown code fences. Each element must \
 have exactly these fields:
 - "zone_name": string, must match the zone_name given in the input exactly
-- "risk_level": one of "Watch" or "Critical" (match or escalate the input status based on your \
-judgment, never de-escalate below what the data shows)
+- "risk_level": one of "Watch" or "Critical" (match or escalate the input status based on your judgment, never de-escalate below what the data shows)
 - "reasoning": 1-2 sentences explaining WHY this zone is risky, referencing the actual numbers given
-- "recommended_action": a specific, actionable instruction an organizer could act on immediately \
-(e.g. redirect flow, open an additional gate, dispatch staff) — not a vague platitude
+- "recommended_action": a specific, actionable instruction an organizer could act on immediately (e.g. redirect flow, open an additional gate, dispatch staff) — not a vague platitude
 - "urgency": one of "low", "medium", "high"
 
 Do not invent zones that weren't given to you. Do not omit any zone that was given to you."""

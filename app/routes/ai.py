@@ -20,7 +20,6 @@ def _client_key(request: Request) -> str:
 
 @router.post("/ai/brief")
 async def ai_brief(request: Request):
-    """Triggers a GenAI reasoning pass over currently flagged zones and returns the rendered brief panel."""
     if not is_allowed(f"brief:{_client_key(request)}", settings.RATE_LIMIT_CHAT_PER_MIN):
         raise HTTPException(status_code=429, detail="Too many requests. Please wait a moment.")
 
@@ -46,7 +45,6 @@ async def ai_brief(request: Request):
 
 @router.post("/ai/chat")
 async def ai_chat(request: Request, chat_request: ChatRequest):
-    """Answers a natural-language question grounded in the current dataset."""
     if not is_allowed(f"chat:{_client_key(request)}", settings.RATE_LIMIT_CHAT_PER_MIN):
         raise HTTPException(status_code=429, detail="Too many requests. Please wait a moment.")
 
@@ -54,6 +52,4 @@ async def ai_chat(request: Request, chat_request: ChatRequest):
         reply = answer_question(chat_request.message)
         return {"reply": reply}
     except LLMError as exc:
-        raise HTTPException(
-            status_code=502, detail=f"AI assistant is temporarily unavailable: {exc}"
-        ) from exc
+        raise HTTPException(status_code=502, detail=f"AI assistant is temporarily unavailable: {exc}") from exc
